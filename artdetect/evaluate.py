@@ -10,13 +10,13 @@ from ignite.contrib.handlers.tensorboard_logger import OutputHandler
 from ignite.engine import Events
 from ignite.handlers import global_step_from_engine
 
-from .data import get_eval_data_loader, configuration_data
-from .engines import create_evaluator
-from .metrics import CocoAP, CocoAP75, CocoAP5
-from .utilities import draw_debug_images, draw_mask, get_model_instance_segmentation, get_iou_types, \
+from artdetect.ignite.data import get_eval_data_loader, configuration_data
+from artdetect.ignite.engines import create_evaluator
+from artdetect.ignite.metrics import CocoAP, CocoAP75, CocoAP5
+from artdetect.ignite.utilities import draw_debug_images, draw_mask, get_model_instance_segmentation, get_iou_types, \
     get_model_instance_detection
-from ..utils import utils
-from ..utils.coco_utils import convert_to_coco_api
+from artdetect.utils import utils
+from artdetect.utils.coco_utils import convert_to_coco_api
 
 
 def run(batch_size=1, log_interval=50, debug_images_interval=10,
@@ -179,8 +179,8 @@ if __name__ == "__main__":
                         help="log directory for Tensorboard log output")
     parser.add_argument("--use_mask", default=False, type=bool,
                         help='use MaskRCNN if True. If False, use FasterRCNN for boxes only.')
-    parser.add_argument("--backbone_name", type=str, default='resnet101',
-                        help='which backbone to use. options are resnet101, resnet50, and shape-resnet50')
+    parser.add_argument("--backbone_name", type=str, default='resnet152',
+                        help='which backbone to use. options are resnet50, resnet101, resnet152, and shape-resnet50')
     args = parser.parse_args()
 
     if not os.path.exists(args.log_dir):

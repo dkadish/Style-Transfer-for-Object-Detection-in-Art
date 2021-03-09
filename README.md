@@ -15,7 +15,7 @@ It may work with updated versions, but this is not guaranteed!
 ## Train a Model
 
 ```
-python -m artnet.train
+python -m artdetect.train
 
 usage: train.py [-h] [--train_dataset_ann_file TRAIN_DATASET_ANN_FILE] [--val_dataset_ann_file VAL_DATASET_ANN_FILE] [--input_checkpoint INPUT_CHECKPOINT] [--output_dir OUTPUT_DIR] [--log_dir LOG_DIR] [--log_interval LOG_INTERVAL]
                 [--debug_images_interval DEBUG_IMAGES_INTERVAL] [--record_histograms RECORD_HISTOGRAMS] [--use_mask USE_MASK] [--backbone_name BACKBONE_NAME] [--trainable_layers TRAINABLE_LAYERS] [--test_size TEST_SIZE]
@@ -89,7 +89,7 @@ training:
 ## Evaluate a Model
 
 ```
-python -m artnet.evaluate -h
+python -m artdetect.evaluate -h
 
 usage: evaluate.py [-h] [--batch_size BATCH_SIZE] [--log_interval LOG_INTERVAL] [--debug_images_interval DEBUG_IMAGES_INTERVAL] [--val_dataset_ann_file VAL_DATASET_ANN_FILE] [--input_checkpoint INPUT_CHECKPOINT] [--log_dir LOG_DIR]
                    [--use_mask USE_MASK] [--backbone_name BACKBONE_NAME]

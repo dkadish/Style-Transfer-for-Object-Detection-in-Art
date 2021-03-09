@@ -2,9 +2,9 @@ from itertools import chain
 from pathlib import Path
 from unittest import TestCase
 
-from artnet.ignite.data import get_eval_data_loader
-from artnet.utils.coco_eval import CocoEvaluator
-from artnet.utils.coco_utils import convert_to_coco_api
+from artdetect.ignite.data import get_eval_data_loader
+from artdetect.utils.coco_eval import CocoEvaluator
+from artdetect.utils.coco_utils import convert_to_coco_api
 
 
 class TestCocoEvaluator(TestCase):

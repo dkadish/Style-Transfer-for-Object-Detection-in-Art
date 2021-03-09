@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import torch
 
-from artnet.data import WeightMixin
+from artdetect.data import WeightMixin
 
 
 class WeightMixinTest(WeightMixin):

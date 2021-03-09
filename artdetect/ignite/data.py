@@ -9,8 +9,8 @@ from PIL import Image
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torchvision.datasets import CocoDetection
 
-from artnet.ignite.transforms import get_transform
-from artnet.ignite.utilities import safe_collate
+from artdetect.ignite.transforms import get_transform
+from artdetect.ignite.utilities import safe_collate
 
 configuration_data = {'image_size': 512, 'mask_predictor_hidden_layer': 256}
 

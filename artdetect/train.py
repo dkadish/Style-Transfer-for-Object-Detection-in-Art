@@ -14,24 +14,16 @@ from ignite.contrib.handlers.tensorboard_logger import WeightsHistHandler, Optim
 from ignite.engine import Events, State
 from ignite.handlers import global_step_from_engine, EarlyStopping
 
-from artnet.ignite.metrics import CocoAP, CocoAP75, CocoAP5
-from .data import get_data_loaders, configuration_data
-from .engines import create_trainer, create_evaluator
-from .utilities import draw_debug_images, draw_mask, get_model_instance_segmentation, get_iou_types, \
+from artdetect.ignite.metrics import CocoAP, CocoAP75, CocoAP5
+from artdetect.ignite.data import get_data_loaders, configuration_data
+from artdetect.ignite.engines import create_trainer, create_evaluator
+from artdetect.ignite.utilities import draw_debug_images, draw_mask, get_model_instance_segmentation, get_iou_types, \
     get_model_instance_detection
-from ..utils import utils
-from ..utils.coco_utils import convert_to_coco_api
-
-# import torch.multiprocessing
-# torch.multiprocessing.set_sharing_strategy('file_system')
-
-# task = Task.init(project_name='Object Detection with TRAINS, Ignite and TensorBoard',
-#                  task_name='Train MaskRCNN with torchvision')
-
-# configuration_data = task.connect_configuration(configuration_data)
+from artdetect.utils import utils
+from artdetect.utils.coco_utils import convert_to_coco_api
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('artnet.ignite.train')
+logger = logging.getLogger('artdetect.ignite.train')
 logging.getLogger('ignite.engine.engine.Engine').setLevel(logging.INFO)
 
 
@@ -373,61 +365,76 @@ def run(warmup_iterations=5000, batch_size=4, test_size=2000, epochs=10, log_int
 
 if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--warmup_iterations', type=int, default=5000,
-                        help='Number of iteration for warmup period (until reaching base learning rate)')
-    parser.add_argument('--batch_size', type=int, default=4,
-                        help='input batch size for training and validation')
-    parser.add_argument('--test_size', type=int, default=2000,
-                        help='number of frames from the test dataset to use for validation')
-    parser.add_argument('--epochs', type=int, default=10,
-                        help='number of epochs to train')
-    parser.add_argument('--log_interval', type=int, default=100,
-                        help='how many batches to wait before logging training status')
-    parser.add_argument('--debug_images_interval', type=int, default=50,
-                        help='how many batches to wait before logging debug images')
-    parser.add_argument('--train_dataset_ann_file', type=str,
-                        default='./annotations/instances_train2017.json',
-                        help='annotation file of train dataset')
-    parser.add_argument('--val_dataset_ann_file', type=str, default='./annotations/instances_val2017.json',
-                        help='annotation file of test dataset')
-    parser.add_argument('--input_checkpoint', type=str, default='',
-                        help='Loading model weights from this checkpoint.')
-    parser.add_argument('--load_optimizer', default=False, type=bool,
-                        help='Use optimizer and lr_scheduler saved in the input checkpoint to resume training')
-    parser.add_argument('--load_params', default=False, type=bool,
-                        help='Use hparameters from the saved pickle file to resume training')
-    parser.add_argument("--output_dir", type=str, default="./checkpoints",
-                        help="output directory for saving models checkpoints")
-    parser.add_argument("--log_dir", type=str, default="./runs",
-                        help="log directory for Tensorboard log output")
-    parser.add_argument("--lr", type=float, default=0.005,
-                        help="learning rate for optimizer")
-    parser.add_argument("--momentum", type=float, default=0.9,
-                        help="momentum for optimizer")
-    parser.add_argument("--weight_decay", type=float, default=0.0005,
-                        help="weight decay for optimizer")
-    parser.add_argument("--use_mask", default=False, type=bool,
+
+    inout_grp = parser.add_argument_group('input / output')
+    inout_grp.add_argument('--train_dataset_ann_file', type=str,
+                           default='./annotations/instances_train2017.json',
+                           help='annotation file of train dataset')
+    inout_grp.add_argument('--val_dataset_ann_file', type=str, default='./annotations/instances_val2017.json',
+                           help='annotation file of test dataset')
+    inout_grp.add_argument('--input_checkpoint', type=str, default='',
+                           help='Loading model weights from this checkpoint.')
+    inout_grp.add_argument("--output_dir", type=str, default="./checkpoints",
+                           help="output directory for saving models checkpoints")
+    inout_grp.add_argument("--log_dir", type=str, default="./runs",
+                           help="log directory for Tensorboard log output")
+
+    log_grp = parser.add_argument_group('logs')
+    log_grp.add_argument('--log_interval', type=int, default=100,
+                         help='how many batches to wait before logging training status')
+    log_grp.add_argument('--debug_images_interval', type=int, default=50,
+                         help='how many batches to wait before logging debug images')
+    log_grp.add_argument("--record_histograms", default=True, type=bool,
+                         help='save histograms during training')
+
+    network_grp = parser.add_argument_group('network')
+    network_grp.add_argument("--use_mask", default=False, type=bool,
                         help='use MaskRCNN if True. If False, use FasterRCNN for boxes only.')
-    parser.add_argument("--use_toy_testing_data", default=False, type=bool,
-                        help='use a small toy dataset to make sure things work')
-    parser.add_argument("--backbone_name", type=str, default='resnet101',
+    network_grp.add_argument("--backbone_name", type=str, default='resnet101',
                         help='which backbone to use. options are resnet101, resnet50, and shape-resnet50')
-    parser.add_argument("--num_workers", type=int, default=6,
-                        help='number of workers to use for data loading')
-    parser.add_argument("--trainable_layers", type=int, default=3,
+    network_grp.add_argument("--trainable_layers", type=int, default=3,
                         help='number of layers to train (1-5)')
-    parser.add_argument("--train_set_size", type=int, default=None,
-                        help='number of images in the training data')
-    parser.add_argument("--early_stopping", default=False, type=bool,
-                        help='use the early stopping function')
-    parser.add_argument("--patience", type=int, default=3,
-                        help='early stopping patience setting (number of epochs to keep going after decline')
+
+
+    evaluation_grp = parser.add_argument_group('evaluation')
+    evaluation_grp.add_argument('--test_size', type=int, default=2000,
+                        help='number of frames from the test dataset to use for validation')
+    evaluation_grp.add_argument("--use_toy_testing_data", default=False, type=bool,
+                        help='use a small toy dataset to make sure things work')
+
+    learning_grp = parser.add_argument_group('learning')
+    learning_grp.add_argument('--warmup_iterations', type=int, default=5000,
+                        help='Number of iteration for warmup period (until reaching base learning rate)')
+    learning_grp.add_argument("--lr", type=float, default=0.005,
+                        help="learning rate for optimizer")
+    learning_grp.add_argument("--momentum", type=float, default=0.9,
+                        help="momentum for optimizer")
+    learning_grp.add_argument("--weight_decay", type=float, default=0.0005,
+                        help="weight decay for optimizer")
     parser.add_argument("--step_size", type=int, default=3,
                         help='step size for learning scheduler')
     parser.add_argument("--gamma", type=float, default=0.1,
                         help="gamma for learning scheduler")
-    parser.add_argument("--record_histograms", default=True, type=bool,
-                        help='save histograms during training')
+
+    early_stop_grp = parser.add_argument_group('early stopping')
+    parser.add_argument("--early_stopping", default=False, type=bool,
+                        help='use the early stopping function')
+    parser.add_argument("--patience", type=int, default=3,
+                        help='early stopping patience setting (number of epochs to keep going after decline')
+
+    training_grp = parser.add_argument_group('training')
+    training_grp.add_argument('--batch_size', type=int, default=4,
+                        help='input batch size for training and validation')
+    training_grp.add_argument('--epochs', type=int, default=10,
+                        help='number of epochs to train')
+    training_grp.add_argument('--load_optimizer', default=False, type=bool,
+                        help='Use optimizer and lr_scheduler saved in the input checkpoint to resume training')
+    training_grp.add_argument('--load_params', default=False, type=bool,
+                        help='Use hparameters from the saved pickle file to resume training')
+    training_grp.add_argument("--num_workers", type=int, default=6,
+                        help='number of workers to use for data loading')
+    training_grp.add_argument("--train_set_size", type=int, default=None,
+                        help='number of images in the training data')
     args = parser.parse_args()
 
     if not os.path.exists(args.output_dir):

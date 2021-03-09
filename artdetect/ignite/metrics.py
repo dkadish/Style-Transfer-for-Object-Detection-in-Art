@@ -2,8 +2,8 @@
 from ignite.metrics import Metric
 from ignite.metrics.metric import reinit__is_reduced
 
-from artnet.plot import get_pr_levels, plot_pr_curve_tensorboard
-from artnet.utils.coco_eval import CocoEvaluator
+from artdetect.plot import get_pr_levels, plot_pr_curve_tensorboard
+from artdetect.utils.coco_eval import CocoEvaluator
 
 
 class CocoMetricBase(Metric):
