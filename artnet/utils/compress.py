@@ -4,14 +4,14 @@ from pathlib import Path
 import tarfile
 
 
-def unzip(zf, overwrite_existing=False):
+def unzip(zf, path=None, overwrite_existing=False):
     with ZipFile(zf) as z:
         for n in tqdm(iterable=z.namelist(), total=len(z.namelist())):
             # print(f)
             f = Path(n)
             if not f.exists() or overwrite_existing:
                 try:
-                    z.extract(str(f))
+                    z.extract(str(f), path=path)
                 except KeyError as e:
                     print(e)
 

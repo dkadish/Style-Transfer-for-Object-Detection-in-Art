@@ -12,7 +12,7 @@ tqdm~=4.50.0
 attrs~=20.1.0
 setuptools~=49.6.0
 jinja2~=2.11.2
-pytorch-ignite
+pytorch-ignite~=0.4.2
 pyocclient
 joblib
 pycocotools
