@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='ArtNet2',
+    name='ArtDetect',
     version='0.1',
     packages=['artdetect', 'artdetect.ignite', 'artdetect.utils'],
     url='https://github.com/dkadish/ArtNet2',
