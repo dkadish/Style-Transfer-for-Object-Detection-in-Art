@@ -1,0 +1,50 @@
+#!/bin/bash
+
+#SBATCH --job-name=ArtDetect     # Job name
+#SBATCH --output=job.%j.out      # Name of output file (%j expands to jobId)
+#SBATCH --cpus-per-task=8        # Schedule one core
+#SBATCH --gres=gpu		           # Schedule a GPU
+#SBATCH --time=24:00:00          # Run time (hh:mm:ss) - run for one hour max
+#SBATCH --partition=red	         # Run on either the Red or Brown queue
+#SBATCH --mail-type=FAIL,END     # Send an email when the job finishes or fails
+
+# Training Parameters
+BATCH_SIZE=16
+LOG_INTERVAL=64
+NUM_WORKERS=16
+TRAIN_SET_SIZE=None
+RECORD_HISTOGRAMS=False
+EARLY_STOPPING=True
+TRAINABLE_LAYERS=2
+STEP_SIZE=5
+GAMMA=0.2
+
+# Evaluation Parameters
+EPOCH=15
+
+echo "Loading Anaconda3"
+module load Anaconda3
+. $(conda info --base)/etc/profile.d/conda.sh
+echo "Activating conda environment"
+conda activate artnet
+which python3.8
+echo "Running Python"
+HOME={DIRNAME}
+DIR=$(date +"%Y-%m-%d_%H-%M-%S")_${SLURM_JOBID}_${TRAIN_SET_SIZE}_resnet152_stylecoco
+mkdir $HOME/results/$DIR
+
+# EVAL VARIABLES
+EVAL_DIR=eval/$DIR-peopleart_eval
+mkdir -p $HOME/results/runs/$EVAL_DIR
+
+# Train the model
+~/.conda/envs/artnet/bin/python  -m artdetect.train --train_dataset_ann_file $HOME/data/style-coco/annotations/person_train2017.json --val_dataset_ann_file $HOME/data/style-coco/annotations/person_val2017.json --output_dir $HOME/results/$DIR/checkpoints --log_dir $HOME/results/runs/$DIR --batch_size $BATCH_SIZE --log_interval $LOG_INTERVAL --num_workers $NUM_WORKERS --trainable_layers $TRAINABLE_LAYERS --backbone_name resnet152 --epochs=$EPOCH --early_stopping $EARLY_STOPPING --record_histograms $RECORD_HISTOGRAMS --gamma $GAMMA --step_size  $STEP_SIZE #--train_set_size $TRAIN_SET_SIZE
+
+sleep 1
+
+LAST_FILE=$(ls -avh $HOME/results/$DIR/checkpoints | grep .pth | tail -1)
+
+# Run evaluation on the last generation
+~/.conda/envs/artnet/bin/python -m artnet.ignite.evaluate_model --val_dataset_ann_file $HOME/data/PeopleArt-Coco/annotations/peopleart_test.json --input_checkpoint $HOME/results/$DIR/checkpoints/$LAST_FILE  --log_dir $HOME/results/runs/$EVAL_DIR --backbone_name resnet152
+
+sleep 1
