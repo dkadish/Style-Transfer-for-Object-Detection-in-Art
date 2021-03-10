@@ -115,3 +115,15 @@ optional arguments:
 ## Create a Stylized Dataset
 
 Coming soon...
+
+## Training on a cluster
+
+See the example run files in `examples/slurm` for a HPC training and evaluation script.
+
+## Citing
+
+If you are using this code or the concept of style transfer for object detection in art, please cite our paper (https://arxiv.org/abs/2102.06529):
+
+D. Kadish, S. Risi, and A. S. Løvlie, “Improving Object Detection in Art Images Using Only Style Transfer,” Feb. 2021.
+
+or use the following [bibtex citation](https://github.com/dkadish/Style-Transfer-for-Object-Detection-in-Art/blob/main/citation.bib).
