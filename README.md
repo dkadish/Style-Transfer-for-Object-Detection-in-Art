@@ -1,8 +1,6 @@
 # Style Transfer for Object Detection in Art
 
-1. Create the dataset
-1. Train the model
-1. Evaluate the model
+Code from the paper Improving Object Detection in Art Images Using Only Style Transfer (https://arxiv.org/abs/2102.06529).
 
 ### Dependencies
 This code is tested with
@@ -11,6 +9,10 @@ This code is tested with
 * PyTorch Ignite 0.4.2
 
 It may work with updated versions, but this is not guaranteed!
+
+### Data and Trained Models
+
+The datasets (StyleCOCO, and COCO-formatted People-Art) and trained model from the paper are available at https://www.kaggle.com/davidkadish/style-transfer-for-object-detection-in-art
 
 ## Train a Model
 
