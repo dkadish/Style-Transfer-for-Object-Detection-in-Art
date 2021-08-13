@@ -1,3 +1,6 @@
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/improving-object-detection-in-art-images/object-detection-on-peopleart)](https://paperswithcode.com/sota/object-detection-on-peopleart?p=improving-object-detection-in-art-images)
+
+
 # Style Transfer for Object Detection in Art
 
 Code from the paper Improving Object Detection in Art Images Using Only Style Transfer (https://arxiv.org/abs/2102.06529).
